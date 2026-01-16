@@ -1,0 +1,147 @@
+i have added new fully new shopify auto site folder isndie that folder  it is lared working so don't need to change anything 
+so ubndertsnt this clearfulyy
+i have addded gate folder and inside gate folder there isshopify auto site folder
+so inside that there is the files
+of soem files don't chnage anything in any other code it is working
+just connect the main.py
+so if any user send gate  cmd the Shopify files will be tiger and it will be use it
+command for normal users And it is a new command that you will add in Shopify do not replace  old first new one okay
+/sx - It is a single chk  CC for normal users
+/msx -  it is a mass chk It will check Mass if any user send in file and reply that file with this command or if anyone send this command with CC then check it in mass okay
+
+
+admins command  only 
+
+/mssx - it will chk  site if it is  Shopify site it or not 
+How if admin send file with links or send this command with links in TXT then check it how to check use DCC in that website with all that for all that site one by one okay and if that cc gives decline then it is working sophify site if that website say error or not found or something like that or another erro or etc etc then it is not Shopify side You will determine it
+So if that website successfully respond to that CC then it is working Shopify sute 
+It's maas chk ok site Shopify 
+And always search  product that it's lowest cheapest price product 
+use that product to buy with that CC try to do payment and if that sorry by side reply with decline then it is working Shopify site 
+After taking send reply with two files one with not working so if I sites and one with working  sites 
+inside it's also this thing 
+site :
+lowest product Price:
+response :
+
+okay 
+and here is hardcoded cc for /mssx to test cc 
+4520340107950985|09|2029|911
+And also add another command for admin only
+/addsx -  admin will send a file with lot of links and if admin reply that file with /addsx then add all those sites of that file to rotation  with will add lot of sites for  global user to chk with 
+/sx and /msx All of global users all the users all the normal users will use this site to chk there cc with cmd /sx and /msx
+If any this  use this command then you will use this site one by one 
+If that side doesn't work then change and use another okay so it will rotate all the site one by one one by one one by one okay if that I didn't work and then try with another site ok 
+
+And also add another command for admin only
+/addpp - command will add lot of rotating proxy Make sure to use those proxy for /sx and /msx it will use rotating proxy to vist and do all stuff with that site it will use that proxy to visite to buy or anything it will be used rotating proxy everytime it do anything with cmd /sx and /mx it proxy will be usedd
+if there is no set procy the.n don't use proxy If there is set proxy then you it  for all that comd /sx and /msx  all global users 
+
+
+and one tim,e i said don't touch other folder all are working and the Shopify is also working just make it ise any suer use cmd of Shopify it should tiger Shopify
+
+And there is a screenshot to show how the it  will show live what cc it is processing but don't show site to users ok don't show site what site it is USING to uses ok 
+show product price 
+show which cc it is processing 
+show approved/live cc  ( if approved cc come then send it to user immediately to users who is checkiing)
+show charged cc   ( if Charged cc come then send it to user immediately to users who is checkig )
+etc etc down is the example 
+qnd make sute to to show live in button telegram button to approve and Charged and unknown and Declined 
+
+for example like this but with refine and other version just like this own my version creat ok advance like this 
+Convert this into improve professional and look cool 
+show what price product it is buysing from whioch cc as well
+show price of the product of site
+show cc which is it usingh
+show what price product it is buysing from whioch cc as well
+show price of the product of site
+show cc which is it usingh
+
+and
+if sitre falback or sent site erro not cc erro then
+try that same cc in another sit
+and
+if sitre falback or sent site erro not cc erro then
+try that same cc in another site
+untill it get resposnse for cc
+
+🔄 𝑹𝒆𝒕𝒓𝒊𝒆𝒔: 382
+━━━━━━━━ 𝑺𝑰𝑻𝑬𝑺 ━━━━━━━━
+🌐 𝑼𝒔𝒂𝒃𝒍𝒆: 763 | 🚫 𝑩𝒂𝒏𝒏𝒆𝒅: 167
+━━━━━━ 𝑳𝑨𝑺𝑻 𝑪𝑯𝑬𝑪𝑲 ━━━━━━
+💳 𝑪𝒂𝒓𝒅: 4159582499347001|08|2027|579
+📌 𝑹𝒆𝒔𝒖𝒍𝒕: ⚠️ Error | 💲 $0.99
+
+and also show if the proxy u are using is working or not
+alive or dead
+only sghow statuss alive ofr dead of proxy don't show proxy to userss
+
+and if site give fallback or error or falied to add in cart then storge the site inm deasd and use another site for that cc
+ok
+
+and saay retriesr count as well
+make it ok
+
+
+⚡💠 𝑺𝒕𝒂𝒕𝒖𝒔: ✅ 𝗖𝗼𝗺𝗽𝗹𝗲𝘁𝗲𝗱
+━━━━━━━ 𝑺𝑻𝑨𝑻𝑺 ━━━━━━━
+📊 𝑷𝒓𝒐𝒈𝒓𝒆𝒔𝒔: 345/345 [██████████] 100.0%
+✅ 𝑯𝒊𝒕𝒔: 0 | ❎ 𝑳𝒊𝒗𝒆: 19
+❌ 𝑫𝒆𝒂𝒅: 221 | ⚠️ 𝑬𝒓𝒓𝒐𝒓𝒔: 105
+━━━━━ 𝑷𝑬𝑹𝑭𝑶𝑹𝑴𝑨𝑵𝑪𝑬 ━━━━━
+⚡ 𝑪𝑷𝑴: 6.8 cards/min
+⏱️ 𝑨𝒗𝒈 𝑻𝒊𝒎𝒆: 78.34s | 🔄 𝑹𝒆𝒕𝒓𝒊𝒆𝒔: 382
+━━━━━━━━ 𝑺𝑰𝑻𝑬𝑺 ━━━━━━━━
+🌐 𝑼𝒔𝒂𝒃𝒍𝒆: 763 | 🚫 𝑩𝒂𝒏𝒏𝒆𝒅: 167
+━━━━━━ 𝑳𝑨𝑺𝑻 𝑪𝑯𝑬𝑪𝑲 ━━━━━━
+💳 𝑪𝒂𝒓𝒅: 4159582499347001|08|2027|579
+📌 𝑹𝒆𝒔𝒖𝒍𝒕: ⚠️ Error | 💲 $0.99
+━━━━━━━━━━━━━━━━━━━━━━━
+📄 𝑭𝒊𝒍𝒆: dump_cc.txt
+👤 𝑩𝒚: 8476155689
+━━━━━━━━━━━━━━━━━━━━━━━
+
+if cc give charged or live or approved or ortder comfromed or order placed in masss chk then send that cc with info instently like this for example
+み ¡@TOjiCHKBot ↯ ↝ 𝙍𝙚𝙨𝙪𝙡𝙩
+𝗦𝗛𝗢𝗣𝗜𝗙𝗬 0.25$
+━━━━━━━━━
+𝐂𝐂 ➜ 4031631286261380|07|30|861
+𝐒𝐓𝐀𝐓𝐔𝐒 ➜ APPROVED ✅
+𝗥𝗲𝘀𝗽𝗼𝗻𝘀𝗲 ➜ ✅ CARD CHARGED! ORDER PLACED! 💰🔥
+Order ID: gid://shopify/OrderIdentity/7236303716668
+Token: a2b080c7a0cf8b24b81ab99b0be6e3c0
+𝑽𝑩𝑽 ➜ N/A
+𝐫𝐞𝐚𝐬𝐨𝐧/𝐭𝐲𝐩𝐞 ➜ N/A
+━━━━━━━━━
+𝐁𝐈𝐍 ➜ 403163
+𝐓𝐘𝐏𝐄 ➜ DEBIT
+𝐂𝐎𝐔𝐍𝐓𝐑𝐘 ➜ 🇺🇸 UNITED STATES
+𝐁𝐀𝐍𝐊 ➜ NETWORK ONLY
+━━━━━━━━━
+𝗧/𝘁 : 19.54s | 𝐏𝐫𝐨𝐱𝐲 : No Proxy
+𝐑𝐄𝐐 : @MUMIRU_01
+𝐃𝐄𝐕 : @MUMIRU
+
+for live
+
+み ¡@TOjiCHKBot ↯ ↝ 𝙍𝙚𝙨𝙪𝙡𝙩
+𝗦𝗛𝗢𝗣𝗜𝗙𝗬 0.25$
+━━━━━━━━━
+𝐂𝐂 ➜ 6236998285990683|05|29|825
+𝐒𝐓𝐀𝐓𝐔𝐒 ➜ APPROVED ✅
+𝗥𝗲𝘀𝗽𝗼𝗻𝘀𝗲 ➜ ✅ Card LIVE! (Action required - 3D Secure)
+𝑽𝑩𝑽 ➜ N/A
+𝐫𝐞𝐚𝐬𝐨𝐧/𝐭𝐲𝐩𝐞 ➜ N/A
+━━━━━━━━━
+𝐁𝐈𝐍 ➜ 623699
+𝐓𝐘𝐏𝐄 ➜ DEBIT
+𝐂𝐎𝐔𝐍𝐓𝐑𝐘 ➜ 🇨🇳 CHINA
+𝐁𝐀𝐍𝐊 ➜ POSTAL SAVINGS BANK OF CHINA
+━━━━━━━━━
+𝗧/𝘁 : 21.43s | 𝐏𝐫𝐨𝐱𝐲 : No Proxy
+𝐑𝐄𝐐 : @MUMIRU_01
+𝐃𝐄𝐕 : @MUMIRU
+
+
+
+etc etc there are more approved or alive or live result send them instently to user ok

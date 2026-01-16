@@ -1,0 +1,40 @@
+2026-01-11 18:51:51,812 - __main__ - INFO - Bot started successfully!
+2026-01-11 18:51:52,396 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8279069249:AAHxjbKPfksr0dlzZ62OmvshOIHkwgkK598/getMe "HTTP/1.1 200 OK"
+2026-01-11 18:51:52,588 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8279069249:AAHxjbKPfksr0dlzZ62OmvshOIHkwgkK598/deleteWebhook "HTTP/1.1 200 OK"
+2026-01-11 18:51:52,590 - telegram.ext.Application - INFO - Application started
+2026-01-11 18:52:01,658 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8279069249:AAHxjbKPfksr0dlzZ62OmvshOIHkwgkK598/getUpdates "HTTP/1.1 200 OK"
+2026-01-11 18:52:01,659 - __main__ - INFO - Access check for user 6124719858 (@MUMIRU_BRO) in private chat 6124719858
+2026-01-11 18:52:01,660 - __main__ - INFO - Access granted: Admin 6124719858
+2026-01-11 18:52:02,412 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8279069249:AAHxjbKPfksr0dlzZ62OmvshOIHkwgkK598/sendMessage "HTTP/1.1 200 OK"
+
+============================================================
+🔍 BRAINTREE AUTOMATED CHECKER
+============================================================
+
+🌐 Target Site: https://www.perfumestore.sg/my-account/add-payment-method/
+💳 Card: 425958******0784|11|2029|***
+
+------------------------------------------------------------
+
+[STEP 1] Attempting to register new account...
+2026-01-11 18:52:11,855 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8279069249:AAHxjbKPfksr0dlzZ62OmvshOIHkwgkK598/getUpdates "HTTP/1.1 200 OK"
+   ✅ Account created: jennifer8688@gmail.com
+
+[STEP 2] Adding billing address...
+   ⚠️ Could not find address nonce, continuing anyway
+
+[STEP 3] Fetching Braintree client token...
+   ✅ Token found at /my-account/add-payment-method/
+   ✅ Token decoded successfully
+   ✅ Authorization fingerprint extracted
+
+[STEP 4] Tokenizing credit card...
+   ✅ Card tokenized successfully
+
+[STEP 5] Submitting payment method...
+2026-01-11 18:52:22,045 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8279069249:AAHxjbKPfksr0dlzZ62OmvshOIHkwgkK598/getUpdates "HTTP/1.1 200 OK"
+   ✅ Payment method submitted
+2026-01-11 18:52:23,847 - gates.braintree.bot - ERROR - Error fetching VBV info: Server disconnected without sending a response.
+2026-01-11 18:52:24,452 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8279069249:AAHxjbKPfksr0dlzZ62OmvshOIHkwgkK598/editMessageText "HTTP/1.1 400 Bad Request"
+2026-01-11 18:52:24,825 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8279069249:AAHxjbKPfksr0dlzZ62OmvshOIHkwgkK598/editMessageText "HTTP/1.1 200 OK"
+2026-01-11 18:52:32,236 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8279069249:AAHxjbKPfksr0dlzZ62OmvshOIHkwgkK598/getUpdates "HTTP/1.1 200 OK"

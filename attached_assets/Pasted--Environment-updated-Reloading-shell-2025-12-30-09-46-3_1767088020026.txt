@@ -1,0 +1,16 @@
+ Environment updated. Reloading shell...
+2025-12-30 09:46:31,529 - __main__ - INFO - Bot started successfully!
+2025-12-30 09:46:32,140 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/getMe "HTTP/1.1 200 OK"
+2025-12-30 09:46:32,339 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/deleteWebhook "HTTP/1.1 200 OK"
+2025-12-30 09:46:32,342 - telegram.ext.Application - INFO - Application started
+2025-12-30 09:46:42,281 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/getUpdates "HTTP/1.1 200 OK"
+2025-12-30 09:46:43,061 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/sendMessage "HTTP/1.1 200 OK"
+2025-12-30 09:46:45,566 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/getUpdates "HTTP/1.1 200 OK"
+2025-12-30 09:46:45,905 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/getUpdates "HTTP/1.1 200 OK"
+2025-12-30 09:46:46,004 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/sendMessage "HTTP/1.1 200 OK"
+2025-12-30 09:46:46,288 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/getUpdates "HTTP/1.1 200 OK"
+2025-12-30 09:46:46,657 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/getUpdates "HTTP/1.1 200 OK"
+2025-12-30 09:46:46,714 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/sendMessage "HTTP/1.1 200 OK"
+2025-12-30 09:46:46,758 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/sendMessage "HTTP/1.1 200 OK"
+2025-12-30 09:46:47,447 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/sendMessage "HTTP/1.1 200 OK"
+2025-12-30 09:46:56,850 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/getUpdates "HTTP/1.1 200 OK"

@@ -1,0 +1,26 @@
+2025-12-30 10:06:40,708 - __main__ - INFO - Bot started successfully!
+2025-12-30 10:06:41,284 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/getMe "HTTP/1.1 200 OK"
+2025-12-30 10:06:41,472 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/deleteWebhook "HTTP/1.1 200 OK"
+2025-12-30 10:06:41,475 - telegram.ext.Application - INFO - Application started
+2025-12-30 10:06:52,045 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/getUpdates "HTTP/1.1 200 OK"
+2025-12-30 10:07:02,235 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/getUpdates "HTTP/1.1 200 OK"
+2025-12-30 10:07:12,430 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/getUpdates "HTTP/1.1 200 OK"
+2025-12-30 10:07:22,621 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/getUpdates "HTTP/1.1 200 OK"
+2025-12-30 10:07:32,811 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/getUpdates "HTTP/1.1 200 OK"
+2025-12-30 10:07:43,012 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/getUpdates "HTTP/1.1 200 OK"
+2025-12-30 10:07:53,204 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/getUpdates "HTTP/1.1 200 OK"
+2025-12-30 10:08:03,396 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/getUpdates "HTTP/1.1 200 OK"
+2025-12-30 10:08:13,587 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/getUpdates "HTTP/1.1 200 OK"
+2025-12-30 10:08:14,085 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8574968899:AAGt3zl3ORfVinm9XJpv03qGKgKgFIUrsoc/getUpdates "HTTP/1.1 200 OK"
+2025-12-30 10:08:14,087 - __main__ - INFO - Access check for user 6124719858 (@MUMIRU_01) in private chat 6124719858
+2025-12-30 10:08:15,186 - telegram.ext.Application - ERROR - No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/telegram/ext/_application.py", line 1315, in process_update
+    await coroutine
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/telegram/ext/_handlers/basehandler.py", line 159, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/main.py", line 978, in sx_command
+    proxy = random.choice(proxies) if proxies else None
+            ^^^^^^
+NameError: name 'random' is not defined
