@@ -1,0 +1,17 @@
+[Unit]
+Description=TOJI CHK Telegram Bot
+After=network.target
+
+[Service]
+Type=simple
+User=runner
+WorkingDirectory=/home/runner/workspace
+EnvironmentFile=/home/runner/workspace/.env
+ExecStart=/home/runner/workspace/venv/bin/python3 /home/runner/workspace/main.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
