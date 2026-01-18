@@ -75,6 +75,23 @@ sys.path.insert(0, 'acc gates/microsoft')
 sys.path.insert(0, 'acc gates/netflix')
 sys.path.insert(0, 'acc gates/spotify')
 from advanced_hotmail_checker import AdvancedHotmailChecker
+from gates.stripe.main import chk_command
+import importlib.util
+
+# Import Stripe Checkout Processor
+stripe_hitter_spec = importlib.util.spec_from_file_location("stripe_hitter", "gates/STRIPE AUTO HITTER/STRIPE AUTO HITTER.py")
+stripe_hitter_module = importlib.util.module_from_spec(stripe_hitter_spec)
+stripe_hitter_spec.loader.exec_module(stripe_hitter_module)
+StripeCheckoutProcessor = stripe_hitter_module.StripeCheckoutProcessor
+
+# Global settings for Checkout Session
+CS_GLOBAL_SETTINGS = {
+    'proxy': None
+}
+
+# Conversation states for /cs
+AWAITING_CS_URL = 100
+AWAITING_CS_CC = 101
 import importlib.util
 netflix_spec = importlib.util.spec_from_file_location("netflix", "acc gates/netflix/netflix.py")
 netflix_module = importlib.util.module_from_spec(netflix_spec)
@@ -465,7 +482,7 @@ async def enforce_access_control(update: Update, context: ContextTypes.DEFAULT_T
             groups_list += "━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
             groups_list += "👆 Use the bot in these groups!"
         else:
-            groups_list = "\n\n📩 Contact @MUMIRU to authorize this group."
+            groups_list = "\n\n📩 Contact @MUMIRU_bro to authorize this group."
         
         message = (
             "╔════════════════════════════════╗\n"
@@ -6397,6 +6414,133 @@ async def rpsta_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
 
+async def cs_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Start checkout session process - /cs url"""
+    user_id = update.effective_user.id
+    if not is_registered(user_id):
+        await update.message.reply_text("⚠️ Please register first using /register")
+        return ConversationHandler.END
+
+    if not context.args:
+        await update.message.reply_text("📝 Usage: /cs <stripe_checkout_url>\nExample: `/cs https://checkout.stripe.com/c/pay/cs_live...`", parse_mode='Markdown')
+        return ConversationHandler.END
+
+    url = context.args[0]
+    processor = StripeCheckoutProcessor()
+    
+    # Extract PK and CS
+    pk, cs = processor.extract_from_api(url)
+    if not pk or not cs:
+        # Fallback to manual extraction
+        if not processor.manual_extract_from_url(url):
+            await update.message.reply_text("❌ Failed to extract PK/CS from the provided URL.")
+            return ConversationHandler.END
+        pk, cs = processor.pk, processor.cs
+
+    context.user_data['cs_processor'] = processor
+    await update.message.reply_text(
+        f"✅ **Checkout Session Extracted**\n"
+        f"🔑 PK: `{pk[:20]}...`\n"
+        f"🔐 CS: `{cs[:20]}...`\n\n"
+        f"📥 Please send the CC details (Max 25).\n"
+        f"Format: `number|mm|yyyy|cvc like this 5522135004940781|08|2028|317                     if year like yy then it will not work`",
+        parse_mode='Markdown'
+    )
+    return AWAITING_CS_CC
+
+async def receive_cs_cc(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Process CC details for the checkout session"""
+    processor = context.user_data.get('cs_processor')
+    if not processor:
+        await update.message.reply_text("❌ Session expired. Please start again with /cs")
+        return ConversationHandler.END
+
+    text = update.message.text
+    cards = []
+    lines = text.strip().split('\n')
+    for line in lines:
+        if '|' in line:
+            parts = line.split('|')
+            if len(parts) >= 4:
+                cards.append(line.strip())
+
+    if not cards:
+        await update.message.reply_text("❌ No valid cards found. Please send in format: `number|mm|year|cvc`", parse_mode='Markdown')
+        return AWAITING_CS_CC
+
+    if len(cards) > 25:
+        await update.message.reply_text("⚠️ Maximum 25 cards allowed at once. Processing the first 25.")
+        cards = cards[:25]
+
+    status_msg = await update.message.reply_text(f"⏳ **Processing Cards...**\n━━━━━━━━━━━━━━━━━━━━\n📊 Total: {len(cards)}\n🔄 Checked: 0\n⏳ Left: {len(cards)}", parse_mode='Markdown')
+    
+    results = []
+    checked_count = 0
+    for card_str in cards:
+        parts = card_str.split('|')
+        cc_details = {
+            'number': parts[0].strip().replace(' ', ''),
+            'exp_month': parts[1].strip().zfill(2),
+            'exp_year': parts[2].strip() if len(parts[2].strip()) == 4 else '20' + parts[2].strip(),
+            'cvc': parts[3].strip()
+        }
+        
+        try:
+            loop = asyncio.get_event_loop()
+            pm_resp = await loop.run_in_executor(None, processor.make_request_1, cc_details)
+            if pm_resp and 'id' in pm_resp:
+                if 'expected_amount' not in processor.extracted_values:
+                    processor.extracted_values['expected_amount'] = "100"
+                
+                final_resp = await loop.run_in_executor(None, processor.make_request_2, pm_resp['id'])
+                
+                if final_resp.get('status') == 'succeeded':
+                    results.append(f"✅ `{card_str}` - SUCCESS")
+                else:
+                    err = final_resp.get('error', {}).get('message', 'Failed')
+                    results.append(f"❌ `{card_str}` - {err}")
+            else:
+                results.append(f"❌ `{card_str}` - Failed to create payment method")
+        except Exception as e:
+            results.append(f"❌ `{card_str}` - Error: {str(e)}")
+
+        checked_count += 1
+        left_count = len(cards) - checked_count
+        if checked_count % 2 == 0 or checked_count == len(cards):
+            try:
+                await status_msg.edit_text(
+                    f"⏳ **Processing Cards...**\n━━━━━━━━━━━━━━━━━━━━\n📊 Total: {len(cards)}\n🔄 Checked: {checked_count}\n⏳ Left: {left_count}",
+                    parse_mode='Markdown'
+                )
+            except:
+                pass
+
+    final_results = "\n".join(results)
+    await status_msg.edit_text(f"✅ **Processing Complete!**\n━━━━━━━━━━━━━━━━━━━━\n{final_results}", parse_mode='Markdown')
+    return ConversationHandler.END
+
+async def pcs_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Set proxy for CS - Admin only"""
+    user_id = update.effective_user.id
+    username = update.effective_user.username
+    if not is_admin(user_id, username):
+        await update.message.reply_text("❌ Admin only command.")
+        return
+
+    if not context.args:
+        current = CS_GLOBAL_SETTINGS['proxy'] or "None"
+        await update.message.reply_text(f"📝 Usage: /pcs <proxy>\nCurrent: `{current}`", parse_mode='Markdown')
+        return
+
+    proxy = context.args[0]
+    CS_GLOBAL_SETTINGS['proxy'] = proxy
+    await update.message.reply_text(f"✅ CS Proxy set to: `{proxy}`", parse_mode='Markdown')
+
+async def cancel_cs(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("❌ Operation cancelled.")
+    return ConversationHandler.END
+
+
 async def mass_check_steam_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Mass check Steam accounts from file"""
     if not update.message.reply_to_message:
@@ -6565,6 +6709,17 @@ def main():
     application.add_handler(CommandHandler("mssx", mssx_command))
     application.add_handler(CommandHandler("addsx", addsx_command))
     application.add_handler(CommandHandler("addpp", addpp_command))
+
+    # Stripe Checkout Handler
+    cs_handler = ConversationHandler(
+        entry_points=[CommandHandler('cs', cs_command)],
+        states={
+            AWAITING_CS_CC: [MessageHandler(filters.TEXT & ~filters.COMMAND, receive_cs_cc)],
+        },
+        fallbacks=[CommandHandler('cancel', cancel_cs)],
+    )
+    application.add_handler(cs_handler)
+    application.add_handler(CommandHandler('pcs', pcs_command))
 
     # Core Commands
     application.add_handler(CommandHandler("start", start))
