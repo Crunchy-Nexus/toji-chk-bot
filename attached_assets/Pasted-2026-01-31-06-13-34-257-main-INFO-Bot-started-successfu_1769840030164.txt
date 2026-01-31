@@ -1,0 +1,46 @@
+2026-01-31 06:13:34,257 - __main__ - INFO - Bot started successfully!
+2026-01-31 06:13:34,839 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8376654672:AAHfPU2qyq9WAx9YExVTDUkmso3FnnNK0Yg/getMe "HTTP/1.1 200 OK"
+2026-01-31 06:13:35,032 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8376654672:AAHfPU2qyq9WAx9YExVTDUkmso3FnnNK0Yg/deleteWebhook "HTTP/1.1 200 OK"
+2026-01-31 06:13:35,034 - telegram.ext.Application - INFO - Application started
+2026-01-31 06:13:35,615 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8376654672:AAHfPU2qyq9WAx9YExVTDUkmso3FnnNK0Yg/getUpdates "HTTP/1.1 200 OK"
+2026-01-31 06:13:35,616 - __main__ - INFO - Access check for user 6124719858 (@MUMIRU_BRO) in private chat 6124719858
+2026-01-31 06:13:35,616 - __main__ - INFO - Access granted: Admin 6124719858
+2026-01-31 06:13:35,996 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8376654672:AAHfPU2qyq9WAx9YExVTDUkmso3FnnNK0Yg/sendMessage "HTTP/1.1 200 OK"
+2026-01-31 06:13:35,997 - telegram.ext.Application - ERROR - No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/telegram/ext/_application.py", line 1315, in process_update
+    await coroutine
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/telegram/ext/_handlers/basehandler.py", line 159, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/main.py", line 214, in sd_command
+    result = await run_sk_check(cc, sk, proxy)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/main.py", line 133, in run_sk_check
+    session = await checker.create_session(checker.get_next_proxy())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/gates/sk based/sk based.py", line 338, in create_session
+    return httpx.AsyncClient(
+           ^^^^^^^^^^^^^^^^^^
+TypeError: AsyncClient.__init__() got an unexpected keyword argument 'proxies'
+2026-01-31 06:13:37,552 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8376654672:AAHfPU2qyq9WAx9YExVTDUkmso3FnnNK0Yg/getUpdates "HTTP/1.1 200 OK"
+2026-01-31 06:13:37,554 - __main__ - INFO - Access check for user 6124719858 (@MUMIRU_BRO) in private chat 6124719858
+2026-01-31 06:13:37,554 - __main__ - INFO - Access granted: Admin 6124719858
+2026-01-31 06:13:37,945 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8376654672:AAHfPU2qyq9WAx9YExVTDUkmso3FnnNK0Yg/sendMessage "HTTP/1.1 200 OK"
+2026-01-31 06:13:37,947 - telegram.ext.Application - ERROR - No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/telegram/ext/_application.py", line 1315, in process_update
+    await coroutine
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/telegram/ext/_handlers/basehandler.py", line 159, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/main.py", line 214, in sd_command
+    result = await run_sk_check(cc, sk, proxy)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/main.py", line 133, in run_sk_check
+    session = await checker.create_session(checker.get_next_proxy())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/gates/sk based/sk based.py", line 338, in create_session
+    return httpx.AsyncClient(
+           ^^^^^^^^^^^^^^^^^^
+TypeError: AsyncClient.__init__() got an unexpected keyword argument 'proxies'
