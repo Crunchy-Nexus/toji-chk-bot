@@ -78,6 +78,295 @@ from advanced_hotmail_checker import AdvancedHotmailChecker
 from gates.stripe.main import chk_command
 import importlib.util
 
+# Global storage files
+GLOBAL_SK_FILE = 'data/global_sks.json'
+GLOBAL_PROXIES_FILE = 'data/global_proxies.json'
+
+def load_global_sk():
+    if not os.path.exists(GLOBAL_SK_FILE):
+        return []
+    try:
+        with open(GLOBAL_SK_FILE, 'r') as f:
+            content = f.read().strip()
+            if not content: return []
+            return json.loads(content)
+    except Exception:
+        return []
+
+def save_global_sk(keys):
+    os.makedirs('data', exist_ok=True)
+    with open(GLOBAL_SK_FILE, 'w') as f:
+        json.dump(keys, f, indent=4)
+
+def load_global_proxies():
+    if not os.path.exists(GLOBAL_PROXIES_FILE):
+        return []
+    try:
+        with open(GLOBAL_PROXIES_FILE, 'r') as f:
+            content = f.read().strip()
+            if not content: return []
+            return json.loads(content)
+    except Exception:
+        return []
+
+def save_global_proxies(proxies):
+    os.makedirs('data', exist_ok=True)
+    with open(GLOBAL_PROXIES_FILE, 'w') as f:
+        json.dump(proxies, f, indent=4)
+
+# Import sk based checker
+sk_based_spec = importlib.util.spec_from_file_location("sk_based", "gates/sk based/sk based.py")
+sk_based_module = importlib.util.module_from_spec(sk_based_spec)
+sk_based_spec.loader.exec_module(sk_based_module)
+AdvancedStripeChecker = sk_based_module.AdvancedStripeChecker
+CardDetails = sk_based_module.CardDetails
+
+async def run_sk_check(cc, sk, proxy=None, mode=2):
+    checker = AdvancedStripeChecker()
+    checker.test_mode = mode # 1 for auth, 2 for charge
+    if proxy:
+        parts = proxy.split(':')
+        if len(parts) == 4:
+            from sk_based import ProxyConfig
+            checker.proxies = [ProxyConfig(host=parts[0], port=int(parts[1]), username=parts[2], password=parts[3])]
+    
+    # cc format parsing
+    cc_match = re.search(r'(\d{15,16})[|/ ](\d{1,2})[|/ ](\d{2,4})[|/ ](\d{3,4})', cc)
+    if not cc_match:
+        cc_parts = re.findall(r'\d+', cc)
+        if len(cc_parts) < 3: return {"success": False, "message": "Invalid CC Format"}
+        num, mon, year = cc_parts[0], cc_parts[1], cc_parts[2]
+        cvv = cc_parts[3] if len(cc_parts) > 3 else "000"
+    else:
+        num, mon, year, cvv = cc_match.groups()
+    
+    exp_year = year[-2:] if len(year) == 4 else year
+    card = CardDetails(number=num, exp_month=mon, exp_year=exp_year, cvv=cvv)
+    
+    session = await checker.create_session(checker.get_next_proxy())
+    if session is None:
+        return {"success": False, "message": "Failed to create session"}
+    try:
+        is_valid, account_info = await checker.validate_sk(session, sk)
+        if not is_valid: 
+            return {"success": False, "message": f"Invalid SK Key: {account_info.get('error', 'Unknown error')}"}
+        
+        valid_account = checker.account
+        result = await checker.test_single_card(card, checker.get_next_proxy(), f"{card.number}|{card.exp_month}|{card.exp_year}|{card.cvv}")
+        return result if isinstance(result, dict) else {"success": False, "message": str(result)}
+    except Exception as e:
+        return {"success": False, "message": f"Check error: {str(e)}"}
+    finally:
+        if session:
+            await session.aclose()
+
+async def addsk_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not is_admin(update.effective_user.id): return
+    keys = []
+    if update.message.reply_to_message and update.message.reply_to_message.document:
+        doc = await update.message.reply_to_message.document.get_file()
+        content = (await doc.download_as_bytearray()).decode()
+        keys = [k.strip() for k in content.split('\n') if k.strip()]
+    else:
+        keys = [k.strip() for k in context.args if k.strip()]
+    
+    current = load_global_sk()
+    new_keys = [k for k in keys if k not in current]
+    save_global_sk(current + new_keys)
+    await update.message.reply_text(f"✅ Added {len(new_keys)} SK keys. Total: {len(current) + len(new_keys)}")
+
+async def rmsk_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not is_admin(update.effective_user.id): return
+    keys = load_global_sk()
+    if not keys:
+        await update.message.reply_text("❌ No SK keys found.")
+        return
+    if not context.args:
+        text = "📝 Current SK keys:\n" + "\n".join([f"{i+1}. {k[:15]}..." for i, k in enumerate(keys)])
+        await update.message.reply_text(text)
+        return
+    try:
+        idx = int(context.args[0]) - 1
+        removed = keys.pop(idx)
+        save_global_sk(keys)
+        await update.message.reply_text(f"✅ Removed: {removed[:15]}...")
+    except:
+        await update.message.reply_text("❌ Invalid index.")
+
+async def sdp_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not is_admin(update.effective_user.id): return
+    proxies = []
+    if update.message.reply_to_message and update.message.reply_to_message.document:
+        doc = await update.message.reply_to_message.document.get_file()
+        content = (await doc.download_as_bytearray()).decode()
+        proxies = [p.strip() for p in content.split('\n') if p.strip()]
+    else:
+        proxies = [p.strip() for p in context.args if p.strip()]
+    
+    current = load_global_proxies()
+    save_global_proxies(list(set(current + proxies)))
+    await update.message.reply_text(f"✅ Added {len(proxies)} proxies. Total: {len(current) + len(proxies)}")
+
+async def au_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    if not is_registered(user_id): return
+    
+    sk_keys = load_global_sk()
+    if not sk_keys:
+        await update.message.reply_text("❌ No global SK keys available.")
+        return
+    
+    cc = context.args[0] if context.args else ""
+    if not cc and update.message.reply_to_message:
+        cc = update.message.reply_to_message.text
+    
+    if not cc:
+        await update.message.reply_text("❌ Usage: /au [cc]")
+        return
+
+    msg = await update.message.reply_text("⏳ Authenticating...")
+    sk = random.choice(sk_keys)
+    proxies = load_global_proxies()
+    proxy = random.choice(proxies) if proxies else None
+    
+    # Get BIN info
+    bin_num = cc[:6]
+    bin_info = await get_bin_info(bin_num)
+    
+    start_time = time.time()
+    result = await run_sk_check(cc, sk, proxy, mode=1)
+    end_time = time.time()
+    
+    status = "Approved ✅" if result.get('success') else "Declined ❌"
+    resp = result.get('message') or result.get('error') or "Unknown"
+    
+    final_text = f"み ¡@𝐓𝐎𝐣𝐢𝐂𝐇𝐊𝐁𝐨𝐭 ↯ ↝ 𝙍𝙚𝙨𝙪𝙡𝙩\n" \
+                 f"SKBASED\n" \
+                 f"━━━━━━━━━━━\n" \
+                 f"CC ➜ {cc}\n" \
+                 f"Status ➜ {status}\n" \
+                 f"Response ➜ {resp}\n" \
+                 f"Gateway ➜ SK BASED AUTH\n" \
+                 f"━━━━━━━━━━━\n" \
+                 f"𝐁𝐈𝐍 ➜ {bin_num}\n" \
+                 f"𝐓𝐘𝐏𝐄 ➜ {bin_info.get('type')}\n" \
+                 f"𝐂𝐎𝐔𝐍𝐓𝐑𝐘 ➜ {bin_info.get('country')}\n" \
+                 f"𝐁𝐀𝐍𝐊 ➜ {bin_info.get('bank')}\n" \
+                 f"━━━━━━━━━\n" \
+                 f"𝗧/𝘁 : {round(end_time - start_time, 2)}s\n" \
+                 f"𝐑𝐄𝐐 : @{update.effective_user.username or 'user'}\n" \
+                 f"𝐃𝐄𝐕 : @mumiru"
+    await msg.edit_text(final_text)
+
+async def sd_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    if not is_registered(user_id): return
+    
+    sk_keys = load_global_sk()
+    if not sk_keys:
+        await update.message.reply_text("❌ No global SK keys available.")
+        return
+    
+    cc = context.args[0] if context.args else ""
+    if not cc and update.message.reply_to_message:
+        cc = update.message.reply_to_message.text
+    
+    if not cc:
+        await update.message.reply_text("❌ Usage: /sd [cc]")
+        return
+
+    msg = await update.message.reply_text("⏳ Charging $1...")
+    sk = random.choice(sk_keys)
+    proxies = load_global_proxies()
+    proxy = random.choice(proxies) if proxies else None
+    
+    # Get BIN info
+    bin_num = cc[:6]
+    bin_info = await get_bin_info(bin_num)
+    
+    start_time = time.time()
+    result = await run_sk_check(cc, sk, proxy, mode=2)
+    end_time = time.time()
+    
+    status = "Charged $1 💳" if result.get('success') else "Declined ❌"
+    resp = result.get('message') or result.get('error') or "Unknown"
+    
+    final_text = f"み ¡@𝐓𝐎𝐣𝐢𝐂𝐇𝐊𝐁𝐨𝐭 ↯ ↝ 𝙍𝙚𝙨𝙪𝙡𝙩\n" \
+                 f"SKBASED\n" \
+                 f"━━━━━━━━━━━\n" \
+                 f"CC ➜ {cc}\n" \
+                 f"Status ➜ {status}\n" \
+                 f"Response ➜ {resp}\n" \
+                 f"Gateway ➜ SK BASED CHARGED 1$\n" \
+                 f"━━━━━━━━━━━\n" \
+                 f"𝐁𝐈𝐍 ➜ {bin_num}\n" \
+                 f"𝐓𝐘𝐏𝐄 ➜ {bin_info.get('type')}\n" \
+                 f"𝐂𝐎𝐔𝐍𝐓𝐑𝐘 ➜ {bin_info.get('country')}\n" \
+                 f"𝐁𝐀𝐍𝐊 ➜ {bin_info.get('bank')}\n" \
+                 f"━━━━━━━━━\n" \
+                 f"𝗧/𝘁 : {round(end_time - start_time, 2)}s\n" \
+                 f"𝐑𝐄𝐐 : @{update.effective_user.username or 'user'}\n" \
+                 f"𝐃𝐄𝐕 : @mumiru"
+    await msg.edit_text(final_text)
+
+async def msd_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    if not is_registered(user_id): return
+    
+    sk_keys = load_global_sk()
+    if not sk_keys:
+        await update.message.reply_text("❌ No global SK keys available.")
+        return
+        
+    ccs = []
+    if update.message.reply_to_message:
+        if update.message.reply_to_message.document:
+            doc = await update.message.reply_to_message.document.get_file()
+            content = (await doc.download_as_bytearray()).decode()
+            ccs = [line.strip() for line in content.split('\n') if line.strip()]
+        else:
+            # CMC - extract CCs from text
+            text = update.message.reply_to_message.text
+            ccs = re.findall(r'\d{15,16}[|/ ]\d{1,2}[|/ ]\d{2,4}[|/ ]\d{3,4}', text)
+    elif context.args:
+        ccs = re.findall(r'\d{15,16}[|/ ]\d{1,2}[|/ ]\d{2,4}[|/ ]\d{3,4}', " ".join(context.args))
+    
+    if not ccs:
+        await update.message.reply_text("❌ No CCs found. Reply to a file or list, or provide CCs after /msd.")
+        return
+
+    msg = await update.message.reply_text(f"⏳ Processing {len(ccs)} CCs with SK rotation...")
+    results = []
+    proxies = load_global_proxies()
+    
+    approved_count = 0
+    for cc in ccs[:100]: # Safety limit
+        sk = random.choice(sk_keys)
+        proxy = random.choice(proxies) if proxies else None
+        res = await run_sk_check(cc, sk, proxy)
+        
+        status = "Approved" if res.get('success') else "Declined"
+        if res.get('success'): approved_count += 1
+        
+        results.append(f"{cc} ➜ {status} ({res.get('message', 'No Response')})")
+        await asyncio.sleep(1) # Rate limit
+
+    output = f"み ¡@𝐓𝐎𝐣𝐢𝐂𝐇𝐊𝐁𝐨𝐭 ↯ ↝ 𝙈𝙖𝙨𝙨 𝙍𝙚𝙨𝙪𝙡𝙩\n"
+    output += f"Gateway: SK BASED\n"
+    output += f"Total: {len(ccs)}\n"
+    output += f"Approved: {approved_count}\n"
+    output += f"━━━━━━━━━━━\n"
+    output += "\n".join(results[:10])
+    
+    if len(results) > 10:
+        file_path = f"msd_results_{user_id}.txt"
+        with open(file_path, 'w') as f:
+            f.write("\n".join(results))
+        await update.message.reply_document(document=open(file_path, 'rb'), caption=f"✅ Processed {len(results)} CCs. Approved: {approved_count}")
+        os.remove(file_path)
+    else:
+        await msg.edit_text(output)
+
 # Import Stripe Checkout Processor
 stripe_hitter_spec = importlib.util.spec_from_file_location("stripe_hitter", "gates/STRIPE AUTO HITTER/STRIPE AUTO HITTER.py")
 stripe_hitter_module = importlib.util.module_from_spec(stripe_hitter_spec)
@@ -6590,6 +6879,22 @@ async def mass_check_steam_file(update: Update, context: ContextTypes.DEFAULT_TY
     raise ApplicationHandlerStop
 
 
+async def banlist_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not is_admin(update.effective_user.id): return
+    banned = get_banned_users()
+    if not banned:
+        await update.message.reply_text("✅ No users are currently banned.")
+        return
+    
+    text = "🚫 𝐁𝐚𝐧𝐧𝐞𝐝 𝐔𝐬𝐞𝐫𝐬 𝐋𝐢𝐬𝐭\n━━━━━━━━━━━━━\n"
+    for uid, data in banned.items():
+        text += f"ID: <code>{uid}</code>\n"
+        text += f"By: @{data.get('banned_by', 'Unknown')}\n"
+        text += f"Date: {data.get('timestamp', 'N/A')[:10]}\n"
+        text += "━━━━━━━━━━━━━\n"
+    
+    await update.message.reply_text(text, parse_mode='HTML')
+
 def main():
     application = Application.builder().token(BOT_TOKEN).concurrent_updates(True).build()
     
@@ -6820,7 +7125,22 @@ def main():
     application.add_handler(CommandHandler("restart", restart_command))
     application.add_handler(CommandHandler("ping", ping_command))
     application.add_handler(CommandHandler("rmpre", rmpre_command))
+    application.add_handler(CommandHandler("banlist", banlist_command))
+    application.add_handler(CommandHandler("au", au_command))
+    application.add_handler(CommandHandler("sd", sd_command))
+    application.add_handler(CommandHandler("msd", msd_command))
+    application.add_handler(CommandHandler("addsk", addsk_command))
+    application.add_handler(CommandHandler("rmsk", rmsk_command))
+    application.add_handler(CommandHandler("sdp", sdp_command))
     application.add_handler(CommandHandler("banlist", banned_list_command))
+    
+    # Global SK Commands
+    application.add_handler(CommandHandler("addsk", addsk_command))
+    application.add_handler(CommandHandler("rmsk", rmsk_command))
+    application.add_handler(CommandHandler("sdp", sdp_command))
+    application.add_handler(CommandHandler("sd", sd_command))
+    application.add_handler(CommandHandler("au", au_command))
+    application.add_handler(CommandHandler("msd", msd_command))
     application.add_handler(MessageHandler(filters.REPLY & filters.COMMAND & filters.Regex(r'^/sh$'), check_shopify_reply))
     application.add_handler(MessageHandler(filters.REPLY & filters.COMMAND & filters.Regex(r'^/chk$'), check_stripe_reply))
     application.add_handler(MessageHandler(filters.REPLY & filters.COMMAND & filters.Regex(r'^/br$'), check_braintree_reply))
