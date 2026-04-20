@@ -16,19 +16,42 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Replace the admin section with this updated version
 ADMIN_OWNER_ID = 6036153411
 ADMIN_OWNER_USERNAME = 'NexusXD17'
-ADMIN_IDS = [ADMIN_OWNER_ID, 6036153411]
+ADMIN_IDS = [ADMIN_OWNER_ID, 6036153411]  # Remove the duplicate
 
 def is_admin(user_id: int, username: str = None) -> bool:
     """Check if user is admin/owner"""
+    # Debug logging - remove this in production
+    print(f"Checking admin status for user_id: {user_id}, username: {username}")
+    print(f"ADMIN_OWNER_ID: {ADMIN_OWNER_ID}, ADMIN_OWNER_USERNAME: {ADMIN_OWNER_USERNAME}")
+    print(f"ADMIN_IDS: {ADMIN_IDS}")
+    
     if user_id == ADMIN_OWNER_ID:
+        print("Matched by ADMIN_OWNER_ID")
         return True
     if username and username.lower() == ADMIN_OWNER_USERNAME.lower():
+        print("Matched by ADMIN_OWNER_USERNAME")
         return True
     if user_id in ADMIN_IDS:
+        print("Matched by ADMIN_IDS")
         return True
+    print("Not an admin")
     return False
+    
+    async def check_admin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Check if user is admin"""
+    user_id = update.effective_user.id
+    username = update.effective_user.username
+    is_user_admin = is_admin(user_id, username)
+    
+    await update.message.reply_text(
+        f"Your user ID: {user_id}\n"
+        f"Your username: @{username if username else 'None'}\n"
+        f"Admin status: {'✅ Yes' if is_user_admin else '❌ No'}",
+        parse_mode=ParseMode.HTML
+    )
 
 # Initialize PayPal processor
 processor = PayPalProcessor()
