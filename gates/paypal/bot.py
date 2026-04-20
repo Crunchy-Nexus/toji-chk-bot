@@ -216,76 +216,220 @@ async def check_mass_direct(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 
 async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle document (file) upload for mass check"""
-    if not context.user_data.get('waiting_for_file'):
-        return
-    
     user_id = update.effective_user.id
     username = update.effective_user.username if update.effective_user else None
+    
+    # Check if we're waiting for a file
+    if not context.user_data.get('waiting_for_file'):
+        return
     
     document = update.message.document
     
     # Check file type
     if not document.file_name.endswith('.txt'):
-        await update.message.reply_text("❌ Please send a .txt file", parse_mode=ParseMode.HTML)
+        await update.message.reply_text("❌ Please send a .txt file with card information", parse_mode=ParseMode.HTML)
         return
     
     try:
+        # Check file size (limit to 5MB)
+        if document.file_size > 5 * 1024 * 1024:  # 5MB
+            await update.message.reply_text("❌ File too large. Maximum size is 5MB", parse_mode=ParseMode.HTML)
+            context.user_data['waiting_for_file'] = False
+            return
+        
         # Download file
         file = await context.bot.get_file(document.file_id)
         file_content = await file.download_as_bytearray()
         cards_text = file_content.decode('utf-8').strip()
         
-        cards_data = [line.strip() for line in cards_text.split('\n') if line.strip()]
+        # Process the file content
+        cards_data = []
+        invalid_lines = []
         
-        if len(cards_data) > 5 and not is_admin(user_id, username):
-            await update.message.reply_text("❌ Maximum 5 cards allowed per check for users! (Admins have unlimited access)", parse_mode=ParseMode.HTML)
+        for line_num, line in enumerate(cards_text.split('\n'), 1):
+            line = line.strip()
+            if not line:
+                continue
+                
+            # Check if line contains card information
+            if '|' in line:
+                parts = line.split('|')
+                if len(parts) == 4:
+                    cards_data.append(line)
+                else:
+                    invalid_lines.append(f"Line {line_num}: Invalid format (expected CARD|MM|YYYY|CVV)")
+            else:
+                # Try to parse different formats
+                if ':' in line:
+                    parts = line.split(':')
+                    if len(parts) == 4:
+                        cards_data.append('|'.join(parts))
+                    else:
+                        invalid_lines.append(f"Line {line_num}: Invalid format")
+                elif ' ' in line:
+                    parts = line.split()
+                    if len(parts) == 4:
+                        cards_data.append('|'.join(parts))
+                    else:
+                        invalid_lines.append(f"Line {line_num}: Invalid format")
+                else:
+                    invalid_lines.append(f"Line {line_num}: Invalid format")
+        
+        # Check limits
+        is_admin = is_admin(user_id, username)
+        max_cards = 100 if is_admin else 5
+        
+        if len(cards_data) > max_cards:
+            await update.message.reply_text(f"❌ Too many cards. Maximum {max_cards} cards allowed per check", parse_mode=ParseMode.HTML)
+            context.user_data['waiting_for_file'] = False
             return
         
         if len(cards_data) == 0:
-            await update.message.reply_text("❌ No cards found in file", parse_mode=ParseMode.HTML)
+            await update.message.reply_text("❌ No valid cards found in file", parse_mode=ParseMode.HTML)
+            if invalid_lines:
+                invalid_summary = "\n".join(invalid_lines[:5])  # Show first 5 errors
+                if len(invalid_lines) > 5:
+                    invalid_summary += f"\n... and {len(invalid_lines) - 5} more errors"
+                await update.message.reply_text(f"File errors:\n{invalid_summary}", parse_mode=ParseMode.HTML)
+            context.user_data['waiting_for_file'] = False
             return
         
-        await update.message.reply_text(f"⏳ Checking {len(cards_data)} card(s)...", parse_mode=ParseMode.HTML)
+        # Send initial message
+        progress_message = await update.message.reply_text(
+            f"⏳ Processing {len(cards_data)} card(s)...\n\n"
+            f"Valid cards: {len(cards_data)}\n"
+            f"Invalid lines: {len(invalid_lines)}",
+            parse_mode=ParseMode.HTML
+        )
         
+        # Process cards
         results = []
+        approved = 0
+        declined = 0
+        
         for idx, card_data in enumerate(cards_data, 1):
             try:
-                parts = card_data.split('|')
-                if len(parts) != 4:
-                    results.append(f"❌ Card {idx}: Invalid format")
-                    continue
+                # Update progress
+                if idx % 5 == 0 or idx == len(cards_data):
+                    await progress_message.edit_text(
+                        f"⏳ Processing {len(cards_data)} card(s)...\n\n"
+                        f"Progress: {idx}/{len(cards_data)} ({idx/len(cards_data)*100:.1f}%)\n"
+                        f"Approved: {approved} | Declined: {declined}",
+                        parse_mode=ParseMode.HTML
+                    )
                 
+                parts = card_data.split('|')
                 cc, mm, yyyy, cvv = parts
                 
                 # Validate
                 if not (len(cc) >= 13 and len(cc) <= 19 and cc.isdigit()):
                     results.append(f"❌ Card {idx}: Invalid card number")
+                    declined += 1
                     continue
                 if not (mm.isdigit() and 1 <= int(mm) <= 12):
                     results.append(f"❌ Card {idx}: Invalid month")
+                    declined += 1
                     continue
                 if not (yyyy.isdigit() and len(yyyy) == 4):
                     results.append(f"❌ Card {idx}: Invalid year")
+                    declined += 1
                     continue
                 if not (cvv.isdigit() and 3 <= len(cvv) <= 4):
                     results.append(f"❌ Card {idx}: Invalid CVV")
+                    declined += 1
                     continue
                 
                 # Check card
                 result = await asyncio.to_thread(processor.process_payment, cc, mm, yyyy, cvv)
-                results.append(f"{result['emoji']} Card {idx}: {result['msg']}")
+                
+                if 'APPROVED' in result['status']:
+                    approved += 1
+                else:
+                    declined += 1
+                
+                # Get additional info for approved cards
+                if 'APPROVED' in result['status']:
+                    vbv_info = await get_vbv_info(cc)
+                    bin_info = get_bin_info(cc[:6])
+                    masked_card = f"{cc[:6]}******{cc[-4:]}|{mm}|{yyyy}|{cvv}"
+                    
+                    results.append(
+                        f"✅ Card {idx}: {result['msg']}\n"
+                        f"📋 Card: {masked_card}\n"
+                        f"🌍 Country: {bin_info.get('country_name', 'N/A')} {bin_info.get('country_flag', '')}\n"
+                        f"🏦 Bank: {bin_info.get('bank', 'N/A')}\n"
+                        f"🔐 VBV: {vbv_info}"
+                    )
+                else:
+                    results.append(f"❌ Card {idx}: {result['msg']}")
                 
             except Exception as e:
                 results.append(f"❌ Card {idx}: Error - {str(e)}")
+                declined += 1
         
-        response = "\n".join(results)
-        await update.message.reply_text(response, parse_mode=ParseMode.HTML)
+        # Prepare summary
+        summary = f"""
+📊 <b>Check Summary</b>
+━━━━━━━━━━━━━━━━
+Total Cards: {len(cards_data)}
+Approved: {approved}
+Declined: {declined}
+Success Rate: {approved/len(cards_data)*100:.1f}%
+━━━━━━━━━━━━━━━━
+        """
         
+        # Send summary
+        await update.message.reply_text(summary, parse_mode=ParseMode.HTML)
+        
+        # Send results in chunks if needed
+        if len(results) <= 10:
+            # Send all results at once
+            response = "\n\n".join(results)
+            await update.message.reply_text(response, parse_mode=ParseMode.HTML)
+        else:
+            # Send results in chunks
+            chunk_size = 10
+            for i in range(0, len(results), chunk_size):
+                chunk = results[i:i+chunk_size]
+                response = "\n\n".join(chunk)
+                await update.message.reply_text(response, parse_mode=ParseMode.HTML)
+                await asyncio.sleep(1)  # Avoid rate limiting
+        
+        # Send invalid lines if any
+        if invalid_lines:
+            invalid_summary = "\n".join(invalid_lines[:10])  # Show first 10 errors
+            if len(invalid_lines) > 10:
+                invalid_summary += f"\n... and {len(invalid_lines) - 10} more errors"
+            
+            await update.message.reply_text(
+                f"⚠️ <b>Invalid Lines in File</b>:\n{invalid_summary}",
+                parse_mode=ParseMode.HTML
+            )
+        
+        # Reset waiting state
         context.user_data['waiting_for_file'] = False
         
     except Exception as e:
-        await update.message.reply_text(f"❌ Error reading file: {str(e)}", parse_mode=ParseMode.HTML)
+        await update.message.reply_text(f"❌ Error processing file: {str(e)}", parse_mode=ParseMode.HTML)
         context.user_data['waiting_for_file'] = False
+
+
+async def export_results(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Export results to a txt file"""
+    user_id = update.effective_user.id
+    username = update.effective_user.username if update.effective_user else None
+    
+    # Only allow admins to use this command
+    if not is_admin(user_id, username):
+        await update.message.reply_text("❌ This command is only available to admins", parse_mode=ParseMode.HTML)
+        return
+    
+    # Check if there are results to export
+    if 'last_results' not in context.user_data:
+        await update.message.reply_text("❌ No results to export", parse_mode=ParseMode.HTML)
+        return
+    
+    results = context.user_data['last_results']
 
 
 async def main() -> None:
