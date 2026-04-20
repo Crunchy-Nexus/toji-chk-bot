@@ -319,5 +319,4 @@ if __name__ == "__main__":
     print("\n" + "="*50)
     print(json.dumps(result, indent=2))
 
-# Add this line in main() with the other command handlers
-application.add_handler(CommandHandler("admin", check_admin))
+
