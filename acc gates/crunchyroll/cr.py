@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 # Bot Configuration
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "7646562599:AAFewgIfKOfms25zZbbCrdtwejaCmhaTUN0")
 BOT_CREATOR = os.getenv("BOT_CREATOR", "@mumiru")
-ADMIN_ID = int(os.getenv("ADMIN_ID", "1805944073"))
+ADMIN_ID = int(os.getenv("ADMIN_ID", "6036153411"))
 
 class ProxyManager:
     """Manages proxy configuration for the bot"""
@@ -526,9 +526,9 @@ class CrunchyrollBot:
     
     def is_admin(self, user_id: int, username: str = None) -> bool:
         """Check if user is admin/owner"""
-        ADMIN_OWNER_ID = 6124719858
-        ADMIN_OWNER_USERNAME = 'MUMIRU_01'
-        ADMIN_IDS = [ADMIN_OWNER_ID, 1805944073]
+        ADMIN_OWNER_ID = 6036153411
+        ADMIN_OWNER_USERNAME = 'NexusXD17'
+        ADMIN_IDS = [ADMIN_OWNER_ID, 6036153411]
         
         if user_id == ADMIN_OWNER_ID:
             return True

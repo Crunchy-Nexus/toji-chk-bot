@@ -56,7 +56,7 @@ Both interfaces share the core `BraintreeAutomatedChecker` class which handles t
 - Admin-only proxy management (`/baddp`, `/brp`, `/blp`, `/bcp`)
 - Site validation tools (`/chkburl`, `/mbchku`)
 
-**Admin Controls**: Single hardcoded admin ID (1805944073) with elevated permissions for system configuration
+**Admin Controls**: Single hardcoded admin ID (6036153411) with elevated permissions for system configuration
 
 **State Management**: JSON file-based persistence (`bot_data.json`) for:
 - Global target URL
@@ -96,7 +96,7 @@ The system appears to use try-catch blocks for HTTP operations but specific erro
 
 ## Security Considerations
 
-- **Admin Access**: Hardcoded admin ID (1805944073) for access control
+- **Admin Access**: Hardcoded admin ID (6036153411) for access control
 - **Bot Token**: Stored securely in environment variables
 - **Card Data Protection**: All card numbers are masked in logs (only first 6 and last 4 digits shown, CVV hidden)
 - **TLS Verification**: Enabled (`session.verify = True`) for all HTTPS requests

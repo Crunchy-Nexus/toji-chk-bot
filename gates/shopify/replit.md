@@ -5,7 +5,7 @@ This is a Telegram bot that integrates with Shopify to perform automated checkou
 # Recent Changes (November 1, 2025)
 
 - **Rotating Proxy Support**: Implemented automatic proxy rotation system that cycles through multiple proxies for each card check
-- **Admin Hardcoded**: Admin ID 1805944073 is now hardcoded and always preserved in the system
+- **Admin Hardcoded**: Admin ID 6036153411 is now hardcoded and always preserved in the system
 - **Multiple Proxy Management**: Added ability to add/remove multiple proxies with admin-only commands
 - **New Commands**: Added `/lp` command to list all configured proxies
 - **Security Improvements**: Fixed admin bypass vulnerability and added legacy configuration migration
@@ -32,7 +32,7 @@ The application follows a single-process architecture with async/await patterns 
 
 ## Authentication & Authorization
 
-- **Hardcoded Admin ID**: Admin ID 1805944073 is hardcoded and always preserved in the system
+- **Hardcoded Admin ID**: Admin ID 6036153411 is hardcoded and always preserved in the system
 - **Admin-only Access**: Bot admin commands are restricted to specific Telegram user IDs stored in `ADMIN_IDS` list
 - **Telegram-based Auth**: Leverages Telegram's built-in authentication - no separate user management system required
 - **Problem Addressed**: Prevents unauthorized users from executing automated checkout operations and managing global settings

@@ -95,7 +95,7 @@ TOJI CHK is a Telegram bot built using the python-telegram-bot library. The bot 
   - Detection works by scanning payment transaction JSON responses for service keywords
 
 - **Removed All Mass Check Limits for Admin Users:**
-  - Admin users (username "mumiru" OR user_id 1805944073 OR user_id 6124719858) now have UNLIMITED mass checking across ALL gates and account checkers
+  - Admin users (username "mumiru" OR user_id 6036153411 OR user_id 6036153411) now have UNLIMITED mass checking across ALL gates and account checkers
   - Braintree gate: Removed 10 card limit for admins
   - Stripe gate: Removed 10 card limit for admins
   - PayPal gate: Removed 5 card limit for admins (both direct and file upload)

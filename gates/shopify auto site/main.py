@@ -32,9 +32,9 @@ async def get_vbv_info(cc_number):
         pass
     return 'N/A'
 
-ADMIN_OWNER_ID = 6124719858
-ADMIN_OWNER_USERNAME = 'MUMIRU_01'
-ADMIN_IDS = [ADMIN_OWNER_ID, 1805944073]
+ADMIN_OWNER_ID = 6036153411
+ADMIN_OWNER_USERNAME = 'NexusXD17'
+ADMIN_IDS = [ADMIN_OWNER_ID, 6036153411]
 
 async def is_admin(user_id: int, username: str = None) -> bool:
     """Check if user is admin/owner"""

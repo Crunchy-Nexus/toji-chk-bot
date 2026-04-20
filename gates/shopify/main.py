@@ -15,9 +15,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-ADMIN_OWNER_ID = 6124719858
-ADMIN_OWNER_USERNAME = 'MUMIRU_01'
-ADMIN_IDS = [ADMIN_OWNER_ID, 1805944073]
+ADMIN_OWNER_ID = 6036153411
+ADMIN_OWNER_USERNAME = 'NexusXD17'
+ADMIN_IDS = [ADMIN_OWNER_ID, 6036153411]
 
 GLOBAL_SETTINGS = {
     'url': None,
@@ -62,15 +62,15 @@ def load_settings():
                 
                 loaded_admin_ids = data.get('admin_ids', [])
                 # Ensure original admins are still there if needed, but primary is the new one
-                if 1805944073 not in loaded_admin_ids:
-                    loaded_admin_ids.insert(0, 1805944073)
+                if 6036153411 not in loaded_admin_ids:
+                    loaded_admin_ids.insert(0, 6036153411)
                 ADMIN_IDS[:] = loaded_admin_ids
     except Exception as e:
         logger.error(f"Error loading settings: {e}")
 
 def save_settings():
     try:
-        # Update admin ids in file if needed, keeping 6124719858 as primary
+        # Update admin ids in file if needed, keeping 6036153411 as primary
         current_admins = list(set(ADMIN_IDS + [ADMIN_OWNER_ID]))
         with open(SETTINGS_FILE, 'w') as f:
             json.dump({

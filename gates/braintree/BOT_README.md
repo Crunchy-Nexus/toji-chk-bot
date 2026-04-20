@@ -14,7 +14,7 @@ A Telegram bot for checking Braintree cards with admin controls, global site/pro
 
 ## 👤 Admin
 
-- **Admin ID:** 1805944073
+- **Admin ID:** 6036153411
 - **Admin Name:** MUMIRU
 - **Admin Username:** @Mumiru
 

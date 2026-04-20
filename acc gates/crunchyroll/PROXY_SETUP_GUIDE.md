@@ -4,7 +4,7 @@
 The Crunchyroll Checker Bot now supports proxy configuration for all account checking requests. This helps prevent rate limiting and blocks by routing requests through proxy servers.
 
 ## Admin Access
-Only the admin (User ID: 1805944073) can manage proxies.
+Only the admin (User ID: 6036153411) can manage proxies.
 
 ## Commands
 

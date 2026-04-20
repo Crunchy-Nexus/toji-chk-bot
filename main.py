@@ -499,9 +499,9 @@ if not BOT_TOKEN:
     logger.error("Or create a .env file with: BOT_TOKEN=your_bot_token")
     sys.exit(1)
 
-ADMIN_OWNER_ID = 6124719858
-ADMIN_OWNER_USERNAME = 'MUMIRU_01'
-ADMIN_IDS = [ADMIN_OWNER_ID, 1805944073]
+ADMIN_OWNER_ID = 6036153411
+ADMIN_OWNER_USERNAME = 'NexusXD17'
+ADMIN_IDS = [ADMIN_OWNER_ID, 6036153411]
 
 def is_admin(user_id: int, username: str = None) -> bool:
     """Check if user is admin/owner"""
@@ -1332,7 +1332,7 @@ def load_shopify_settings():
                 return json.load(f)
     except:
         pass
-    return {"settings": {"url": "", "proxies": [], "proxy_index": 0, "sites": []}, "admin_ids": [6124719858]}
+    return {"settings": {"url": "", "proxies": [], "proxy_index": 0, "sites": []}, "admin_ids": [6036153411]}
 
 def save_shopify_settings(settings):
     with open(SHOPIFY_AUTO_FILE, 'w') as f:
