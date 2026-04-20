@@ -471,6 +471,7 @@ async def main() -> None:
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("pp", check_single))
     application.add_handler(CommandHandler("mpp", check_mass_direct))
+    application.add_handler(CommandHandler("admin", check_admin))  # ADD THIS LINE
     application.add_handler(MessageHandler(filters.Document.ALL, handle_document))
     
     # Start the Bot
@@ -482,7 +483,6 @@ async def main() -> None:
     
     # Run until you send an interrupt signal
     await asyncio.Event().wait()
-
 
 if __name__ == '__main__':
     try:
